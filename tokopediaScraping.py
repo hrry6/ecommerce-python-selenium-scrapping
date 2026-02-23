@@ -4,7 +4,7 @@ def tokoScrap(driver, By, time):
     driver.implicitly_wait(2)
     mid = driver.find_element(By.XPATH, "/html/body/div[1]/div/div[2]/div[2]/div[12]/div/h2")
     driver.execute_script("arguments[0].scrollIntoView();", mid)
-    komenSection = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[12]/div/div/section/section')
+    komenSection = driver.find_element(By.XPATH, "//*[@id='review-feed']")
     articles = komenSection.find_elements(By.TAG_NAME, "article")
     idx = 1
     print("=============================================================")
@@ -24,12 +24,15 @@ def tokoScrap(driver, By, time):
             break
         next_buttons[0].click()
         time.sleep(1)
-        komenSection = driver.find_element(By.XPATH, '/html/body/div[1]/div/div[2]/div[2]/div[12]/div/div/section/section')
+        komenSection = driver.find_element(By.XPATH, "//*[@id='review-feed']")
         articles = komenSection.find_elements(By.TAG_NAME, "article")
         for article in articles:
             print("Komen ke ", idx)
             pembungkusKomen = article.find_element(By.TAG_NAME, "div")
             isiKomen = pembungkusKomen.find_elements(By.TAG_NAME, "p")
-            print(isiKomen[2].text)
+            if len(isiKomen) > 2:
+                print(isiKomen[2].text)
+            else:
+                print(isiKomen[1].text)
             idx += 1
         i += 1

@@ -1,6 +1,5 @@
 def aliScrap(driver, By, time, wait, EC):
     linkAlibaba = input("Masukkan link Alibaba: ")
-    # linkAlibaba = "https://www.alibaba.com/product-detail/Havit-H628BT-Wireless-Headphone-Stereo-Foldable_1600967787750.html?spm=a2700.prosearch.normal_offer.d_image.3c9467afknUxpW&priceId=d35dcc8853d0465f9325df8e3c881940"
     driver.implicitly_wait(10)
     driver.get(linkAlibaba)
     mid = driver.find_element(By.XPATH, "/html/body/div[1]/main/div[1]/div[2]/div[13]/div/div/h2")
@@ -61,5 +60,5 @@ def aliScrap(driver, By, time, wait, EC):
         scroll_count += 1
 
     for i, text in enumerate(collected, 1):
-        print("Komen ke", i+1)
+        print("Komen toko ke", i+1)
         print(text)
