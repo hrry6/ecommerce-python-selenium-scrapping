@@ -4,13 +4,26 @@ def aliScrap(driver, By, time, wait, EC):
     driver.get(linkAlibaba)
     mid = driver.find_element(By.XPATH, "/html/body/div[1]/main/div[1]/div[2]/div[13]/div/div/h2")
     driver.execute_script("arguments[0].scrollIntoView();", mid)
-    print("Berhasil scroll to elemen")
 
     print("=============================================================")
-    comments = driver.find_elements(By.XPATH,"//div[contains(@class,'r-relative') and contains(@class,'r-text')]")
-    for i, comment in enumerate(comments):
-        print("Komen ke", i+1)
-        print(comment.text)
+    productName = driver.find_element(By.CLASS_NAME, "product-title-container")
+    tokoName = driver.find_element(By.CLASS_NAME, "company-name")
+    print("Nama Produk:", productName.text)
+    print("Nama Toko:", tokoName.text)
+
+    numberOfProduct = driver.find_element(By.CSS_SELECTOR,'button[role="tab"][aria-controls*="content-product"]').text.replace("Product reviews (", "").replace(")", "")
+
+    if numberOfProduct != "0":
+        reviews = driver.find_elements(By.CSS_SELECTOR,'div.r-flex-1.r-overflow-hidden.r-text-ellipsis.r-whitespace-nowrap')
+        for i, review in enumerate(reviews):
+            print("=============================================================")
+            isiReview = review.find_element(By.XPATH,".//div[contains(@class,'r-relative') and contains(@class,'r-text')]")
+            waktuReview = review.find_element(By.CSS_SELECTOR,'div.r-font-Inter.r-text-left')
+            print("Review produk ke", i+1)
+            print("Waktu:", waktuReview.text)
+            print("Isi:", isiReview.text)
+    else:
+        print("Produk ini tidak punya review")
 
     storebtn = driver.find_element(
         By.XPATH,
@@ -31,7 +44,7 @@ def aliScrap(driver, By, time, wait, EC):
         driver.execute_script("arguments[0].click();", showbtn)
 
     print("=============================================================")
-    print("Sedang mengambil data...")
+    print("Sedang mengambil review toko...")
 
     dialog = wait.until(EC.presence_of_element_located(
         (By.XPATH, "//div[@role='dialog']")
@@ -39,19 +52,26 @@ def aliScrap(driver, By, time, wait, EC):
 
     scroll_box = dialog.find_element(By.XPATH, ".//div[contains(@class,'overflow')]")
 
-    collected = set()
+    collected = []
     scroll_count = 0
     max_scroll = 20
-
     while scroll_count < max_scroll:
-        comments = dialog.find_elements(
-            By.XPATH,
-            ".//div[contains(@class,'r-relative') and contains(@class,'r-text')]"
-        )
-        for c in comments:
-            text = c.text.strip()
-            if text:
-                collected.add(text)
+        reviews = driver.find_elements(By.CSS_SELECTOR,'div.r-flex-1.r-overflow-hidden.r-text-ellipsis.r-whitespace-nowrap')
+        for review in reviews:
+            try:
+                isiReview = review.find_element(
+                    By.XPATH,
+                    ".//div[contains(@class,'r-relative') and contains(@class,'r-text')]"
+                ).text.strip()
+
+                waktuReview = review.find_element(By.CSS_SELECTOR,"div.r-font-Inter.r-text-left").text.strip()
+
+                data = (waktuReview, isiReview)
+
+                if data not in collected:
+                    collected.append(data)
+            except:
+                continue
         driver.execute_script(
             "arguments[0].scrollTop = arguments[0].scrollHeight",
             scroll_box
@@ -59,6 +79,8 @@ def aliScrap(driver, By, time, wait, EC):
         time.sleep(1)
         scroll_count += 1
 
-    for i, text in enumerate(collected, 1):
-        print("Komen toko ke", i+1)
-        print(text)
+    for i, (waktu, isi) in enumerate(collected, 1):
+        print("=============================================================")
+        print("Review toko ke", i)
+        print("Waktu:", waktu)
+        print("Isi:", isi)

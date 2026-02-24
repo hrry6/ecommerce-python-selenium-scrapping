@@ -2,13 +2,23 @@ def amaScrap(driver, By, time):
     linkAmazon = input("Masukkan link Amazon: ")
     driver.get(linkAmazon)
     driver.implicitly_wait(3)
-    mid = driver.find_element(By.XPATH, "/html/body/div[1]/div[1]/div/div[35]/div/div/div/div/div[2]/div/div[2]/div[1]/div/div/div/h3")
+    mid = driver.find_element(By.CSS_SELECTOR, "h3[data-testid='heading']")
     driver.execute_script("arguments[0].scrollIntoView();", mid)
-    comments = driver.find_elements(By.CLASS_NAME, "review-data")
+    reviews = driver.find_elements(By.XPATH,'.//div[starts-with(@id,"customer_review")]')
+
+    print("=============================================================")    
+    productName = driver.find_element(By.ID, "title")
+    print("Nama Produk:", productName.text)
+    tokoName = driver.find_element(By.XPATH, '//a[@id="bylineInfo"]')
+    print("Nama Toko:", tokoName.text.replace("Visit the ", "").replace(" Store", ""))
+
     i = 1
-    print("=============================================================")
-    for comment in comments:
-        print("Komen ke", i)
-        print(comment.text)
+    for review in reviews:
+        print("=============================================================")
+        reviewDate = review.find_element(By.CSS_SELECTOR, 'span[data-hook="review-date"]')
+        reviewIsi = review.find_element(By.CSS_SELECTOR, 'span[data-hook="review-body"]')
+        print("Review ke", i)
+        print("Waktu:", reviewDate.text.split(" on ")[-1])
+        print("Isi:",reviewIsi.text)
         i += 1
 
