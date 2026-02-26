@@ -1,56 +1,53 @@
 # 🛒 ecommerce-python-selenium-scrapping
 
-Script sederhana berbasis **Python + Selenium** untuk melakukan scraping komentar produk dari website e-commerce.
+A simple Python + Selenium-based script for scraping product comments from e-commerce websites.
 
-Dengan script ini, user dapat:
+With this script, users can:
 
-- Mengambil komentar dari suatu produk
-- Menampilkan seluruh komentar yang tersedia (termasuk pagination)
-- Mengotomatisasi proses scroll & navigasi halaman komentar
+- Retrieve comments from a product
+- Display all available comments (including pagination)
+- Automate the scrolling and navigation process of the comment page
 
-Project ini cocok untuk:
+This project is suitable for:
 
-- Belajar web scraping
-- Eksperimen Selenium
-- Pengolahan data komentar / review produk
-
----
+- Learning web scraping
+- Selenium experiments
+- Processing product comment/review data
 
 ## ⚙️ Requirements
 
-Pastikan sudah menginstall:
+Make sure you have installed:
 
-- Python 3.x  
-- Google Chrome / Chromium  
-- ChromeDriver (sesuai versi browser)  
-- Selenium  
-
----
+- Python 3.x
+- Google Chrome / Chromium
+- ChromeDriver (depending on your browser version)
+- Selenium
 
 ## 📦 Install Selenium
 
 ```bash
 pip install selenium
 ```
-Pastikan:
 
-- Versi ChromeDriver sesuai dengan versi Chrome / Chromium
-- Path ChromeDriver sudah benar di dalam script
-- Browser dapat dijalankan tanpa error
+Make sure:
 
-## 🚀 Cara Menjalankan
+- ChromeDriver version matches your Chrome/Chromium version
+- ChromeDriver path is correct in the script
+- Browser runs without errors
 
-Masuk ke folder project lalu jalankan:
+## 🚀 How to Run
+
+Go to the project folder and run:
 
 ```bash
 python main.py
 ```
 
-## 🧠 Cara Kerja Singkat
+## 🧠 How It Works in Brief
 
-Script akan:
-- Membuka browser menggunakan Selenium
-- Mengakses halaman produk(pastikan memberikan link halaman yang sudah terdapat komentar)
-- Scroll ke bagian komentar
-- Mengambil seluruh komentar yang tersedia
-- Menampilkan komentar ke terminal
+The script will:
+- Open a browser using Selenium
+- Access the product page (make sure to provide a link to the page that already has comments)
+- Scroll to the comments section
+- Fetch all available comments
+- Display the comments in the terminal
