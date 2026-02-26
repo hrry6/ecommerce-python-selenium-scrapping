@@ -1,23 +1,23 @@
 import csv
 
 def aliScrap(driver, By, time, wait, EC):
-    linkAlibaba = input("Masukkan link Alibaba: ")
+    alibabaLink = input("Enter Alibaba link: ")
     driver.implicitly_wait(10)
-    driver.get(linkAlibaba)
+    driver.get(alibabaLink)
 
     mid = driver.find_element(By.XPATH, "/html/body/div[1]/main/div[1]/div[2]/div[13]/div/div/h2")
     driver.execute_script("arguments[0].scrollIntoView();", mid)
 
     print("=============================================================")
 
-    productName = driver.find_element(By.CLASS_NAME, "product-title-container")
-    tokoName = driver.find_element(By.CLASS_NAME, "company-name")
+    productNameEl = driver.find_element(By.CLASS_NAME, "product-title-container")
+    shopNameEl = driver.find_element(By.CLASS_NAME, "company-name")
 
-    nama_produk = productName.text.strip()
-    nama_toko = tokoName.text.strip()
+    productName = productNameEl.text.strip()
+    shopName = shopNameEl.text.strip()
 
-    print("Nama Produk:", nama_produk)
-    print("Nama Toko:", nama_toko)
+    print("Product Name:", productName)
+    print("Shop Name:", shopName)
 
     data_reviews = []
 
@@ -33,23 +33,22 @@ def aliScrap(driver, By, time, wait, EC):
         for i, review in enumerate(reviews, 1):
             print("=============================================================")
 
-            isiReview = review.find_element(By.XPATH,".//div[contains(@class,'r-relative') and contains(@class,'r-text')]").text.strip()
+            reviewContains = review.find_element(By.XPATH,".//div[contains(@class,'r-relative') and contains(@class,'r-text')]").text.strip()
+            reviewDate = review.find_element(By.CSS_SELECTOR,"div.r-font-Inter.r-text-left").text.strip()
 
-            waktuReview = review.find_element(By.CSS_SELECTOR,"div.r-font-Inter.r-text-left").text.strip()
-
-            print("Review produk ke", i)
-            print("Waktu:", waktuReview)
-            print("Isi:", isiReview)
+            print("Product review num", i)
+            print("Date:", reviewDate)
+            print("Contains:", reviewContains)
 
             data_reviews.append([
-                nama_produk,
-                nama_toko,
-                "produk",
-                waktuReview,
-                isiReview
+                productName,
+                shopName,
+                "product",
+                reviewDate,
+                reviewContains
             ])
     else:
-        print("Produk ini tidak punya review")
+        print("This product has no review")
 
     storebtn = driver.find_element(By.XPATH,"//button[@role='tab' and contains(., 'Store')]")
     driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", storebtn)
@@ -61,7 +60,7 @@ def aliScrap(driver, By, time, wait, EC):
         driver.execute_script("arguments[0].click();", showbtn)
 
     print("=============================================================")
-    print("Sedang mengambil review toko...")
+    print("Getting shop review...")
 
     dialog = wait.until(EC.presence_of_element_located((By.XPATH, "//div[@role='dialog']")))
 
@@ -75,12 +74,12 @@ def aliScrap(driver, By, time, wait, EC):
         reviews = dialog.find_elements(By.CSS_SELECTOR,'div.r-flex-1.r-overflow-hidden.r-text-ellipsis.r-whitespace-nowrap')
         for review in reviews:
             try:
-                isi_elem = review.find_element(By.XPATH,".//div[contains(@class,'r-relative') and contains(@class,'r-text')]")
-                waktu_elems = review.find_elements(By.CSS_SELECTOR,"div.r-font-Inter.r-text-left")
-                isiReview = isi_elem.text.strip()
-                waktuReview = waktu_elems[0].text.strip() if waktu_elems else "Tidak tersedia"
-                data = (waktuReview, isiReview)
-                if isiReview and data not in collected:
+                containsEl = review.find_element(By.XPATH,".//div[contains(@class,'r-relative') and contains(@class,'r-text')]")
+                dateEl = review.find_elements(By.CSS_SELECTOR,"div.r-font-Inter.r-text-left")
+                reviewContains = containsEl.text.strip()
+                reviewDate = dateEl[0].text.strip() if dateEl else "Tidak tersedia"
+                data = (reviewDate, reviewContains)
+                if reviewContains and data not in collected:
                     collected.append(data)
             except:
                 continue
@@ -89,37 +88,38 @@ def aliScrap(driver, By, time, wait, EC):
         time.sleep(2)
         scroll_count += 1
 
-    for i, (waktu, isi) in enumerate(collected, 1):
+    for i, (date, contains) in enumerate(collected, 1):
         print("=============================================================")
-        print("Review toko ke", i)
-        print("Waktu:", waktu)
-        print("Isi:", isi)
+        print("Shop review num", i)
+        print("Date:", date)
+        print("Contains:", contains)
+
 
         data_reviews.append([
-            nama_produk,
-            nama_toko,
-            "toko",
-            waktu,
-            isi
+            productName,
+            shopName,
+            "shop",
+            date,
+            contains
         ])
 
-    simpan = input("\nApakah anda ingin menyimpan data? (y/n): ").lower()
+    save = input("\nSave data in data.csv? (y/n): ").lower()
 
-    if simpan == "y":
+    if save == "y":
         with open("data.csv", mode="a", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
 
             if file.tell() == 0:
                 writer.writerow([
-                    "Nama Produk",
-                    "Nama Toko",
-                    "Jenis Review",
-                    "Waktu Review",
-                    "Isi Review"
+                    "Product Name",
+                    "Shop Name",
+                    "Review Type",
+                    "Date Review",
+                    "Review Contains"
                 ])
 
             writer.writerows(data_reviews)
 
-        print("✅ Data berhasil disimpan ke data.csv")
+        print("✅ Data successfully saved to data.csv")
     else:
-        print("❌ Data tidak disimpan.")
+        print("❌ Data not saved")

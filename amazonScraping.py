@@ -1,8 +1,8 @@
 import csv
 
 def amaScrap(driver, By, time):
-    linkAmazon = input("Masukkan link Amazon: ")
-    driver.get(linkAmazon)
+    amazonLink = input("Enter Amazon Link: ")
+    driver.get(amazonLink)
     driver.implicitly_wait(3)
 
     mid = driver.find_element(By.CSS_SELECTOR, "h3[data-testid='heading']")
@@ -12,51 +12,54 @@ def amaScrap(driver, By, time):
 
     print("=============================================================")
 
-    productName = driver.find_element(By.ID, "title")
-    tokoName = driver.find_element(By.XPATH, '//a[@id="bylineInfo"]')
+    productNameEl = driver.find_element(By.ID, "title")
+    shopNameEl = driver.find_element(By.XPATH, '//a[@id="bylineInfo"]')
 
-    nama_produk = productName.text.strip()
-    nama_toko = tokoName.text.replace("Visit the ", "").replace(" Store", "").strip()
+    productName = productNameEl.text.strip()
+    shopName = shopNameEl.text.replace("Visit the ", "").replace(" Store", "").strip()
 
-    print("Nama Produk:", nama_produk)
-    print("Nama Toko:", nama_toko)
+    print("Product Name:", productName)
+    print("Shop Name:", shopName)
 
     data_reviews = []
 
     i = 1
     for review in reviews:
         print("=============================================================")
-
         reviewDate = review.find_element(By.CSS_SELECTOR,'span[data-hook="review-date"]')
+        reviewContains = review.find_element(By.CSS_SELECTOR,'span[data-hook="review-body"]')
+        date = reviewDate.text.split(" on ")[-1].strip()
+        contains = reviewContains.text.strip()
 
-        reviewIsi = review.find_element(By.CSS_SELECTOR,'span[data-hook="review-body"]')
-
-        tanggal = reviewDate.text.split(" on ")[-1].strip()
-        isi = reviewIsi.text.strip()
-
-        print("Review ke", i)
-        print("Waktu:", tanggal)
-        print("Isi:", isi)
+        print("Product review num", i)
+        print("Date:", date)
+        print("Contains:", contains)
 
         data_reviews.append([
-            nama_produk,
-            nama_toko,
-            "produk",
-            tanggal,
-            isi
+            productName,
+            shopName,
+            "product",
+            date,
+            contains
         ])
         i += 1
 
-    simpan = input("\nApakah anda ingin menyimpan data? (y/n): ").lower()
+    save = input("\nSave data in data.csv? (y/n): ").lower()
 
-    if simpan == "y":
+    if save == "y":
         with open("data.csv", mode="a", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
 
             if file.tell() == 0:
-                writer.writerow(["Nama Produk", "Nama Toko","Jenis Review", "Waktu Review", "Isi Review"])
+                writer.writerow([
+                    "Product Name",
+                    "Shop Name",
+                    "Review Type",
+                    "Date Review",
+                    "Review Contains"
+                ])
             writer.writerows(data_reviews)
 
-        print("✅ Data berhasil disimpan ke data.csv")
+        print("✅ Data successfully saved to data.csv")
     else:
-        print("❌ Data tidak disimpan.")
+        print("❌ Data not saved")
